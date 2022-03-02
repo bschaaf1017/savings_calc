@@ -1,22 +1,23 @@
 <div id="employee-calculator" class="savings-calculator">
   <div id="inputs" class="input-wrapper">
-    <p class="calculator-input-group">
+    <div class="calculator-input-group">
+
       <label>Paycheck Frequency</label><br>
-    <div class="btn-group">
-      <button id="freq-btn1" class="freq-btn btn-clicked" value="Weekly">Weekly</button>
-      <button id="freq-btn2" class="freq-btn" value="Bi-Weekly">Bi-Weekly</button>
-      <button id="freq-btn3" class="freq-btn" value="Bi-Monthly">Bi-Monthly</button>
-      <button id="freq-btn4" class="freq-btn" value="Monthly">Monthly</button>
+      <div class="btn-group">
+        <button id="freq-btn1" class="freq-btn btn-clicked" value="Weekly">Weekly</button>
+        <button id="freq-btn2" class="freq-btn" value="Bi-Weekly">Bi-Weekly</button>
+        <button id="freq-btn3" class="freq-btn" value="Bi-Monthly">Bi-Monthly</button>
+        <button id="freq-btn4" class="freq-btn" value="Monthly">Monthly</button>
+      </div>
     </div>
-    </p>
     <p class="calculator-input-group">
-      <label>Amount saved per paycheck:</label><br><br>
+      <label>Amount saved per paycheck:</label><br>
       <input id="paycheck-savings" class="calculator-slider inputs" data-is-currency="true" type="range" min="1"
         max="250" value="5">
       <span id="paycheck-savings-value">$5.00</span>
     </p>
     <p class="calculator-input-group">
-      <label>Age of Sunny Day Fund®:</label><br><br>
+      <label>Age of Sunny Day Fund®:</label><br>
       <input id="sdf-age" class="calculator-slider inputs" type="range" min="3" max="60" step="3" value="9">
       <span id="sdf-age-value">9</span> months
     </p>
@@ -124,7 +125,8 @@
     const employer_contribution = (savings_without_sdf * (1.05 ** (q / 3))) - savings_without_sdf;
     const savings_with_sdf = savings_without_sdf + employer_contribution;
     // const sdf_intrest = (monthlyContribution(employer_contribution, q) * 12) / savings_with_sdf
-    const sdf_intrest = calcAPY(savings_with_sdf, q, f, s)
+    const sdf_intrest = calcAPY(savings_with_sdf, q, f, s, employer_contribution)
+    console.log('sdf_intrest: ', sdf_intrest)
 
     set('employee-contribution-without', format(savings_without_sdf))
     set('employee-contribution-with', format(savings_without_sdf))
@@ -149,30 +151,48 @@
     }));
   });
 
-  function calcAPY(total, age, freq, perCheckSavings) {
+  function calcAPY(total, age, freq, perCheckSavings, currCont) {
     console.log('total: ', total, 'age: ', age, 'freq: ', freq, 'perCheckSavings: ', perCheckSavings);
     if (age < 12) {
       const newAge = 12 - age;
-      console.log('new age: ', newAge)
-      let estimateYearlySavings;
+      // let estimateYearlySavings;
       if (freq === 'Weekly') {
         const remainYearSavings = weeklyCalc(perCheckSavings) * newAge;
-        const remainEmployerCont = (remainYearSavings * (1.05 ** (newAge / 3))) - remainYearSavings;
-        estimateYearlySavings = remainEmployerCont + remainYearSavings + total
-        console.log('newSavings WEEKLY: ', estimateYearlySavings);
+        return returnAPY(total, remainYearSavings, newAge, currCont)
+        // const remainEmployerCont = (remainYearSavings * (1.05 ** (newAge / 3))) - remainYearSavings;
+        // const totalYearEmployerCont = remainEmployerCont + currCont
+        // estimateYearlySavings = remainEmployerCont + remainYearSavings + total
+        // const apy = (estimateYearlySavings - (estimateYearlySavings - totalYearEmployerCont)) / (estimateYearlySavings - totalYearEmployerCont)
+        // console.log('newSavings WEEKLY: ', estimateYearlySavings, 'currCont: ', totalYearEmployerCont, 'apy: , apy: ', apy);
+        // return apy;
       } else if (freq === 'Bi-Weekly' || freq === 'Bi-Monthly') {
         const remainYearSavings = biWeekCalc(perCheckSavings) * newAge;
-        const remainEmployerCont = (remainYearSavings * (1.05 ** (newAge / 3))) - remainYearSavings;
-        estimateYearlySavings = remainEmployerCont + remainYearSavings + total
-        console.log('newSavings BIIIIII: ', estimateYearlySavings);
+        return returnAPY(total, remainYearSavings, newAge, currCont)
+        // const remainEmployerCont = (remainYearSavings * (1.05 ** (newAge / 3))) - remainYearSavings;
+        // const totalYearEmployerCont = remainEmployerCont + currCont
+        // estimateYearlySavings = remainEmployerCont + remainYearSavings + total
+        // const apy = (estimateYearlySavings - (estimateYearlySavings - totalYearEmployerCont)) / (estimateYearlySavings - totalYearEmployerCont)
+        // console.log('newSavings BIIII: ', estimateYearlySavings, 'currCont: ', totalYearEmployerCont, 'apy: , apy: ', apy);
+        // return apy;
       } else {
         const remainYearSavings = perCheckSavings * newAge;
-        const remainEmployerCont = (remainYearSavings * (1.05 ** (newAge / 3))) - remainYearSavings;
-        estimateYearlySavings = remainEmployerCont + remainYearSavings + total
-        console.log('newSavings MONTH: ', estimateYearlySavings);
+        return returnAPY(total, remainYearSavings, newAge, currCont)
+        // const remainEmployerCont = (remainYearSavings * (1.05 ** (newAge / 3))) - remainYearSavings;
+        // const totalYearEmployerCont = remainEmployerCont + currCont
+        // estimateYearlySavings = remainEmployerCont + remainYearSavings + total
+        // const apy = (estimateYearlySavings - (estimateYearlySavings - totalYearEmployerCont)) / (estimateYearlySavings - totalYearEmployerCont)
+        // console.log('newSavings MONTH: ', estimateYearlySavings, 'currCont: ', totalYearEmployerCont, 'apy: , apy: ', apy);
+        // return apy;
       }
 
     }
+  }
+
+  function returnAPY(totalSoFar, restOfyearSavings, remainingMonths, currCont) {
+    const remainEmployerCont = (restOfyearSavings * (1.05 ** (remainingMonths / 3))) - restOfyearSavings;
+    const totalYearEmployerCont = remainEmployerCont + currCont;
+    const estimateYearlySavings = remainEmployerCont + restOfyearSavings + totalSoFar;
+    return (estimateYearlySavings - (estimateYearlySavings - totalYearEmployerCont)) / (estimateYearlySavings - totalYearEmployerCont)
   }
 
 </script>
@@ -239,6 +259,7 @@
     -webkit-appearance: none;
     background: transparent;
     border: none !important;
+    width: 100%;
   }
 
   .calculator-slider::-webkit-slider-thumb {
@@ -282,7 +303,7 @@
     font-weight: bolder;
   }
 
-  @media only screen and (max-width: 781px) {
+  @media only screen and (max-width: 800px) {
     .savings-calculator {
       display: block;
       padding: 8%;
@@ -296,8 +317,29 @@
       width: 100%;
     }
 
+    .btn-group {
+      width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+  }
+
     .calculator-input-group {
       white-space: normal;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      /* justify-content:center; */
+      align-items: center;
+
+    }
+
+    .calculator-input-group>span {
+      margin-top: 7px;
+    }
+
+    .calculator-slider {
+      width: 100%;
     }
 
     .savings-calculator>div p {

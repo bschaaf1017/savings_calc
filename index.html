@@ -125,7 +125,7 @@
     const employer_contribution = (savings_without_sdf * (1.05 ** (q / 3))) - savings_without_sdf;
     const savings_with_sdf = savings_without_sdf + employer_contribution;
     // const sdf_intrest = (monthlyContribution(employer_contribution, q) * 12) / savings_with_sdf
-    const sdf_intrest = calcAPY(savings_with_sdf, q, f, s, employer_contribution)
+    const sdf_intrest = calcAPY(savings_with_sdf, q, f, s, employer_contribution, savings_without_sdf)
     console.log('sdf_intrest: ', sdf_intrest)
 
     set('employee-contribution-without', format(savings_without_sdf))
@@ -151,40 +151,24 @@
     }));
   });
 
-  function calcAPY(total, age, freq, perCheckSavings, currCont) {
+  function calcAPY(total, age, freq, perCheckSavings, currCont, savings_without_sdf) {
     console.log('total: ', total, 'age: ', age, 'freq: ', freq, 'perCheckSavings: ', perCheckSavings);
     if (age < 12) {
       const newAge = 12 - age;
-      // let estimateYearlySavings;
       if (freq === 'Weekly') {
         const remainYearSavings = weeklyCalc(perCheckSavings) * newAge;
-        return returnAPY(total, remainYearSavings, newAge, currCont)
-        // const remainEmployerCont = (remainYearSavings * (1.05 ** (newAge / 3))) - remainYearSavings;
-        // const totalYearEmployerCont = remainEmployerCont + currCont
-        // estimateYearlySavings = remainEmployerCont + remainYearSavings + total
-        // const apy = (estimateYearlySavings - (estimateYearlySavings - totalYearEmployerCont)) / (estimateYearlySavings - totalYearEmployerCont)
-        // console.log('newSavings WEEKLY: ', estimateYearlySavings, 'currCont: ', totalYearEmployerCont, 'apy: , apy: ', apy);
-        // return apy;
+        return returnAPY(total, remainYearSavings, newAge, currCont);
       } else if (freq === 'Bi-Weekly' || freq === 'Bi-Monthly') {
         const remainYearSavings = biWeekCalc(perCheckSavings) * newAge;
-        return returnAPY(total, remainYearSavings, newAge, currCont)
-        // const remainEmployerCont = (remainYearSavings * (1.05 ** (newAge / 3))) - remainYearSavings;
-        // const totalYearEmployerCont = remainEmployerCont + currCont
-        // estimateYearlySavings = remainEmployerCont + remainYearSavings + total
-        // const apy = (estimateYearlySavings - (estimateYearlySavings - totalYearEmployerCont)) / (estimateYearlySavings - totalYearEmployerCont)
-        // console.log('newSavings BIIII: ', estimateYearlySavings, 'currCont: ', totalYearEmployerCont, 'apy: , apy: ', apy);
-        // return apy;
+        return returnAPY(total, remainYearSavings, newAge, currCont);
       } else {
         const remainYearSavings = perCheckSavings * newAge;
-        return returnAPY(total, remainYearSavings, newAge, currCont)
-        // const remainEmployerCont = (remainYearSavings * (1.05 ** (newAge / 3))) - remainYearSavings;
-        // const totalYearEmployerCont = remainEmployerCont + currCont
-        // estimateYearlySavings = remainEmployerCont + remainYearSavings + total
-        // const apy = (estimateYearlySavings - (estimateYearlySavings - totalYearEmployerCont)) / (estimateYearlySavings - totalYearEmployerCont)
-        // console.log('newSavings MONTH: ', estimateYearlySavings, 'currCont: ', totalYearEmployerCont, 'apy: , apy: ', apy);
-        // return apy;
+        return returnAPY(total, remainYearSavings, newAge, currCont);
       }
-
+    } else {
+      const diff = total - savings_without_sdf
+      console.log('diff : ', diff);
+      return increasePercent = diff / savings_without_sdf;
     }
   }
 
@@ -192,7 +176,7 @@
     const remainEmployerCont = (restOfyearSavings * (1.05 ** (remainingMonths / 3))) - restOfyearSavings;
     const totalYearEmployerCont = remainEmployerCont + currCont;
     const estimateYearlySavings = remainEmployerCont + restOfyearSavings + totalSoFar;
-    return (estimateYearlySavings - (estimateYearlySavings - totalYearEmployerCont)) / (estimateYearlySavings - totalYearEmployerCont)
+    return (estimateYearlySavings - (estimateYearlySavings - totalYearEmployerCont)) / (estimateYearlySavings - totalYearEmployerCont);
   }
 
 </script>

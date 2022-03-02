@@ -1,0 +1,320 @@
+<div id="employee-calculator" class="savings-calculator">
+  <!-- <div class="input-wrapper"> -->
+  <div id="inputs" class="input-wrapper">
+    <p class="calculator-input-group">
+      <label>Paycheck Frequency</label><br>
+      <div class="btn-group">
+        <button id="freq-btn1" class="freq-btn btn-clicked" value="Weekly">Weekly</button>
+        <button id="freq-btn2" class="freq-btn" value="Bi-Weekly">Bi-Weekly</button>
+        <button id="freq-btn3" class="freq-btn" value="Bi-Monthly">Bi-Monthly</button>
+        <button id="freq-btn4" class="freq-btn" value="Monthly">Monthly</button>
+      </div>
+    </p>
+    <p class="calculator-input-group">
+      <label>Amount saved per paycheck:</label><br>
+      <input id="paycheck-savings" class="calculator-slider inputs" data-is-currency="true" type="range" min="1"
+        max="250" value="5">
+      <span id="paycheck-savings-value">$5.00</span>
+    </p>
+    <p class="calculator-input-group">
+      <label>Age of Sunny Day Fund®:</label><br>
+      <input id="sdf-age" class="calculator-slider inputs" type="range" min="3" max="60" step="3" value="9">
+      <span id="sdf-age-value">9</span> months
+    </p>
+  </div>
+  <!-- </div> -->
+
+  <div id="result-table" class="result-table">
+    <table>
+      <colgroup>
+        <col>
+        <col span="1" style="background-color: #e3e7e7">
+        <col span="1" style="background-color: #ffa926">
+      </colgroup>
+      <tr>
+        <th></th>
+        <th>Without SDF</th>
+        <th>With SDF</th>
+      </tr>
+      <tr>
+        <th>Total Savings Potential:</td>
+        <td id="savings-without-sdf">$180.00</td>
+        <td id="savings-with-sdf">$208.37</td>
+      </tr>
+      <tr>
+        <th>Employer Contribution:</th>
+        <td>$0</td>
+        <td id="employer-contribution">$28.37</td>
+      </tr>
+      <!-- <tr>
+        <th>Effective Annual Savings:</th>
+        <td id="annual-without">$240.00</td>
+        <td id="annual-with">$268.37</td>
+      </tr> -->
+      <tr>
+        <th>Effective Intrest Rate (APY):</th>
+        <td>0%</td>
+        <td id="sdf-intrest">13.62%</td>
+      </tr>
+    </table>
+    <!-- <p>
+      Total saving potential <strong>without</strong> Sunny Day Fund™:<br>
+      <span id="savings-without-sdf" class="calculator-savings-label"></span>
+    </p>
+    <p>
+      Estimated employer contribution with Sunny Day Fund™:<br>
+      <span id="employer-contribution" class="calculator-savings-label"></span>
+    </p>
+    <p>
+      Estimated total saving potential <strong>with Sunny Day Fund™</strong>:<br>
+      <span id="savings-with-sdf" class="calculator-savings-label"></span>
+    </p> -->
+  </div>
+</div>
+
+<script>
+  let f = 'Weekly';
+
+  const get = id => document.getElementById(id).value;
+  const set = (id, value) => document.getElementById(id).innerText = value;
+
+  const format = number => new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  }).format(number);
+
+  const formatPercent = num => new Intl.NumberFormat('default', {
+    style: 'percent',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(num);
+
+  const weeklyCalc = amt => amt * 4;
+  const biWeekCalc = amt => amt * 2;
+  const calcAnnualWithout = amt => amt * 12;
+  const monthlyContribution = (cont, age) => cont / age
+
+  const calculate = (event) => {
+    const is_pointer_event = event instanceof PointerEvent
+    console.log('evernt: ', event)
+
+    if (is_pointer_event) {
+      const currClicked = new Promise((resolve, reject) => {
+        const ele = document.getElementsByClassName('btn-clicked')
+        resolve(ele)
+      });
+
+      currClicked
+      .then((res) => res[0].setAttribute("class", "freq-btn"))
+      .then(() => {
+        document.getElementById(event.target.id).setAttribute("class", "btn-clicked")
+        f = event.target.value
+      })
+      .catch((err) => console.log('error:', err));
+    }
+
+    const display_elem_id = `${event.target.id}-value`;
+    const is_currency_field = Boolean(event.target.dataset.isCurrency);
+    const formatted_value = is_currency_field ? format(event.target.value) : event.target.value;
+
+    if (event.target.children.length === 0 && !is_pointer_event) {
+      set(display_elem_id, formatted_value);
+    }
+
+    const s = get('paycheck-savings');
+    const q = get('sdf-age');
+
+    const savings_without_sdf =
+      f === 'Weekly' ? weeklyCalc(s) * q
+        : f === 'Bi-Weekly' || f === 'Bi-Monthly'
+          ? biWeekCalc(s) * q
+          : s * q;
+
+    const employer_contribution = (savings_without_sdf * (1.05 ** (q / 3))) - savings_without_sdf;
+    const savings_with_sdf = savings_without_sdf + employer_contribution;
+    // const annual_without_sdf = calcAnnualWithout(savings_without_sdf / q);
+    // const annual_with_sdf = annual_without_sdf + employer_contribution;
+
+    console.log('monthly cont: ', (monthlyContribution(employer_contribution, q) * 12) / savings_with_sdf)
+    const sdf_intrest = (monthlyContribution(employer_contribution, q) * 12) / savings_with_sdf
+
+    set('employer-contribution', format(employer_contribution));
+    set('savings-without-sdf', format(savings_without_sdf));
+    set('savings-with-sdf', format(savings_with_sdf));
+    // set('annual-without', format(annual_without_sdf))
+    // set('annual-with', format(annual_with_sdf));
+    set('sdf-intrest', formatPercent(sdf_intrest))
+  };
+
+  document.querySelectorAll('.inputs').forEach((slider) => {
+    slider.addEventListener('change', calculate);
+  });
+
+  document.querySelectorAll('.freq-btn').forEach((btn) => {
+    btn.addEventListener('click', calculate);
+  })
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('paycheck-savings').dispatchEvent(new Event('input', {
+      bubbles: true,
+      cancelable: true
+    }));
+  });
+
+</script>
+
+<style>
+  .savings-calculator * {
+    font-family: Montserrat, sans-serif;
+  }
+
+  .savings-calculator {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 25px 0;
+    border: 2px solid #ffa926;
+  }
+
+  .input-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* width: 100%; */
+    /* margin-bottom: 14px; */
+  }
+
+  .btn-group {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+  }
+
+  .freq-btn {
+    width: fit-content;
+    padding: 3px;
+    background-color: #ffa926;
+    border: 1px solid #004462;
+    border-radius: 5px;
+    color: #004462;
+    cursor: pointer;
+  }
+
+  .btn-group button:hover {
+    background-color: #004462;
+    color: #ffa926;
+  }
+
+  .btn-clicked {
+    background-color: #004462;
+    border: 1px solid #004462;
+    border-radius: 5px;
+    color: #ffa926;
+    cursor: pointer;
+    width: fit-content;
+    padding: 3px
+  }
+
+  .calculator-input-group {
+    white-space: nowrap;
+  }
+
+  .calculator-input-group>* {
+    vertical-align: middle;
+  }
+
+  .calculator-slider {
+    -webkit-appearance: none;
+    background: transparent;
+    border: none !important;
+  }
+
+  .calculator-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    margin-top: -4px;
+    border: 1px solid #000;
+    height: 12px;
+    width: 12px;
+    border-radius: 6px;
+    background: #004462;
+  }
+
+  .calculator-slider::-webkit-slider-runnable-track {
+    background: #ffa926;
+    height: 3px;
+  }
+
+  .calculator-slider::-moz-range-thumb {
+    background: #004462;
+  }
+
+  .calculator-slider::-moz-range-track {
+    height: 3px;
+    background-color: #ffa926;
+  }
+
+  .calculator-slider:focus {
+    outline: none;
+  }
+
+  .calculator-slider::-ms-track {
+    width: 100%;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+  }
+
+  .calculator-savings-label {
+    color: #ffa926;
+    font-weight: bolder;
+  }
+
+  @media only screen and (max-width: 781px) {
+    .savings-calculator {
+      display: block;
+      padding: 8%;
+      width: 50%;
+      margin-left: auto;
+      margin-right: auto;
+      min-width: 310px;
+    }
+
+    .input-wrapper {
+      width: 100%;
+    }
+
+    .calculator-input-group {
+      white-space: normal;
+    }
+
+    .savings-calculator>div p {
+      margin-bottom: 14px;
+    }
+
+
+  }
+
+  @media only screen and (max-width: 730px) {
+    .input-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    .top-inputs {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .result-table {
+    display: flex;
+    justify-content: center;
+  }
+
+  th,
+  td {
+    padding: 5px;
+    text-align: center
+  }
+</style>

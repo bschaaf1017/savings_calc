@@ -36,6 +36,12 @@
         <th class="top-right">With SDF</th>
       </tr>
       <tr>
+        <th>Employee Contribution:</td>
+        <td id="employee-contribution-without">$180.00</td>
+        <th></th>
+        <td id="employee-contribution-with">$180.00</td>
+      </tr>
+      <tr>
         <th>Employer Contribution:</td>
         <td>$0</td>
         <th></th>
@@ -84,6 +90,7 @@
     console.log('evernt: ', event)
 
     if (is_pointer_event) {
+      f = event.target.value
       const currClicked = new Promise((resolve, reject) => {
         const ele = document.getElementsByClassName('btn-clicked')
         resolve(ele)
@@ -93,7 +100,6 @@
         .then((res) => res[0].setAttribute("class", "freq-btn"))
         .then(() => {
           document.getElementById(event.target.id).setAttribute("class", "btn-clicked")
-          f = event.target.value
         })
         .catch((err) => console.log('error:', err));
     }
@@ -117,17 +123,13 @@
 
     const employer_contribution = (savings_without_sdf * (1.05 ** (q / 3))) - savings_without_sdf;
     const savings_with_sdf = savings_without_sdf + employer_contribution;
-    // const annual_without_sdf = calcAnnualWithout(savings_without_sdf / q);
-    // const annual_with_sdf = annual_without_sdf + employer_contribution;
-
-    console.log('monthly cont: ', (monthlyContribution(employer_contribution, q) * 12) / savings_with_sdf)
     const sdf_intrest = (monthlyContribution(employer_contribution, q) * 12) / savings_with_sdf
 
+    set('employee-contribution-without', format(savings_without_sdf))
+    set('employee-contribution-with', format(savings_without_sdf))
     set('employer-contribution', format(employer_contribution));
     set('savings-without-sdf', format(savings_without_sdf));
     set('savings-with-sdf', format(savings_with_sdf));
-    // set('annual-without', format(annual_without_sdf))
-    // set('annual-with', format(annual_with_sdf));
     set('sdf-intrest', formatPercent(sdf_intrest))
   };
 
@@ -165,8 +167,6 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    /* width: 100%; */
-    /* margin-bottom: 14px; */
   }
 
   .btn-group {
@@ -276,7 +276,6 @@
     .savings-calculator>div p {
       margin-bottom: 14px;
     }
-
 
   }
 

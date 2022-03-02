@@ -1,14 +1,13 @@
 <div id="employee-calculator" class="savings-calculator">
-  <!-- <div class="input-wrapper"> -->
   <div id="inputs" class="input-wrapper">
     <p class="calculator-input-group">
       <label>Paycheck Frequency</label><br>
-      <div class="btn-group">
-        <button id="freq-btn1" class="freq-btn btn-clicked" value="Weekly">Weekly</button>
-        <button id="freq-btn2" class="freq-btn" value="Bi-Weekly">Bi-Weekly</button>
-        <button id="freq-btn3" class="freq-btn" value="Bi-Monthly">Bi-Monthly</button>
-        <button id="freq-btn4" class="freq-btn" value="Monthly">Monthly</button>
-      </div>
+    <div class="btn-group">
+      <button id="freq-btn1" class="freq-btn btn-clicked" value="Weekly">Weekly</button>
+      <button id="freq-btn2" class="freq-btn" value="Bi-Weekly">Bi-Weekly</button>
+      <button id="freq-btn3" class="freq-btn" value="Bi-Monthly">Bi-Monthly</button>
+      <button id="freq-btn4" class="freq-btn" value="Monthly">Monthly</button>
+    </div>
     </p>
     <p class="calculator-input-group">
       <label>Amount saved per paycheck:</label><br>
@@ -22,39 +21,32 @@
       <span id="sdf-age-value">9</span> months
     </p>
   </div>
-  <!-- </div> -->
-
   <div id="result-table" class="result-table">
     <table>
-      <!-- <colgroup>
+      <colgroup>
         <col>
-        <col id="col1" span="1">
+        <col class="col1" span="1">
         <col>
-        <col id="col2" span="1">
-      </colgroup> -->
+        <col class="col2" span="1">
+      </colgroup>
       <tr>
         <th></th>
-        <td class="top-left"><strong>Without SDF</strong></td>
+        <th class="top-left">Without SDF</th>
         <th></th>
-        <td class="top-right"><strong>With SDF</strong></td>
+        <th class="top-right">With SDF</th>
       </tr>
       <tr>
-        <th><strong>Total Savings Potential:</strong></th>
-        <td id="savings-without-sdf">$180.00</td>
-        <th></th>
-        <td id="savings-with-sdf">$208.37</td>
-      </tr>
-      <tr>
-        <th><strong>Employer Contribution:</strong></td>
+        <th>Employer Contribution:</td>
         <td>$0</td>
         <th></th>
         <td id="employer-contribution">$28.37</td>
       </tr>
-      <!-- <tr>
-        <td>Effective Annual Savings:</td>
-        <td id="annual-without">$240.00</td>
-        <td id="annual-with">$268.37</td>
-      </tr> -->
+      <tr>
+        <th>Total Savings Potential:</th>
+        <td id="savings-without-sdf">$180.00</td>
+        <th></th>
+        <td id="savings-with-sdf">$208.37</td>
+      </tr>
       <tr>
         <th><strong>Effective Intrest Rate (APY):</strong></th>
         <td class="bottom-left">0%</td>
@@ -62,18 +54,6 @@
         <td id="sdf-intrest" class="bottom-right">13.62%</td>
       </tr>
     </table>
-    <!-- <p>
-      Total saving potential <strong>without</strong> Sunny Day Fund™:<br>
-      <span id="savings-without-sdf" class="calculator-savings-label"></span>
-    </p>
-    <p>
-      Estimated employer contribution with Sunny Day Fund™:<br>
-      <span id="employer-contribution" class="calculator-savings-label"></span>
-    </p>
-    <p>
-      Estimated total saving potential <strong>with Sunny Day Fund™</strong>:<br>
-      <span id="savings-with-sdf" class="calculator-savings-label"></span>
-    </p> -->
   </div>
 </div>
 
@@ -110,12 +90,12 @@
       });
 
       currClicked
-      .then((res) => res[0].setAttribute("class", "freq-btn"))
-      .then(() => {
-        document.getElementById(event.target.id).setAttribute("class", "btn-clicked")
-        f = event.target.value
-      })
-      .catch((err) => console.log('error:', err));
+        .then((res) => res[0].setAttribute("class", "freq-btn"))
+        .then(() => {
+          document.getElementById(event.target.id).setAttribute("class", "btn-clicked")
+          f = event.target.value
+        })
+        .catch((err) => console.log('error:', err));
     }
 
     const display_elem_id = `${event.target.id}-value`;
@@ -316,39 +296,29 @@
     display: flex;
     justify-content: center;
   }
-  /* table { border-collapse: collapse; } */
-td { border: solid 1px #000; }
-.top-left {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-.top-right {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-.bottom-right {
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-.bottom-left {
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-  /* table {
+
+  table {
     border: none;
     border-collapse: collapse;
-  } */
-  /* #col1 {
-    border: 2px solid #e3e7e7;
-    border-radius: 3px;
   }
-  #col2 {
-    border: 2px solid #ffa926
-  } */
-  /* table td {
-    border-left: 1px solid #000;
-  } */
-/* table td:first-child { border-left: none; } */
+
+  .col1 {
+    border: 2px solid #c9cccc;
+  }
+
+  .col2 {
+    border: 2px solid #ffa926;
+  }
+
+  .top-left {
+    background-color: #c9cccc;
+    color: white;
+  }
+
+  .top-right {
+    background-color: #ffa926;
+    color: white;
+  }
 
   th,
   td {

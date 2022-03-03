@@ -6,7 +6,7 @@
       <div class="btn-group">
         <button id="freq-btn1" class="freq-btn btn-clicked" value="Weekly">Weekly</button>
         <button id="freq-btn2" class="freq-btn" value="Bi-Weekly">Bi-Weekly</button>
-        <button id="freq-btn3" class="freq-btn" value="Bi-Monthly">Bi-Monthly</button>
+        <button id="freq-btn3" class="freq-btn" value="Semi-Monthly">Semi-Monthly</button>
         <button id="freq-btn4" class="freq-btn" value="Monthly">Monthly</button>
       </div>
     </div>
@@ -116,17 +116,21 @@
     const s = get('paycheck-savings');
     const q = get('sdf-age');
 
-    const savings_without_sdf =
-      f === 'Weekly' ? weeklyCalc(s) * q
-        : f === 'Bi-Weekly' || f === 'Bi-Monthly'
-          ? biWeekCalc(s) * q
-          : s * q;
+    const monthlySavings =
+     //if pay freq is weekly return savings * 4
+      f === 'Weekly' ? weeklyCalc(s)
+      // if everyother week return savings * 2 else return savings
+        : f === 'Bi-Weekly' || f === 'Semi-Monthly'
+          ? biWeekCalc(s) : s;
 
+    const dailySavings = monthlySavings / 30;
+
+    const savings_without_sdf = monthlySavings * q;
     const employer_contribution = (savings_without_sdf * (1.05 ** (q / 3))) - savings_without_sdf;
+    const employee_contribution3 = savings_without_sdf * .05
+    console.log('333333:', employee_contribution3)
     const savings_with_sdf = savings_without_sdf + employer_contribution;
-    // const sdf_intrest = (monthlyContribution(employer_contribution, q) * 12) / savings_with_sdf
     const sdf_intrest = calcAPY(savings_with_sdf, q, f, s, employer_contribution, savings_without_sdf)
-    console.log('sdf_intrest: ', sdf_intrest)
 
     set('employee-contribution-without', format(savings_without_sdf))
     set('employee-contribution-with', format(savings_without_sdf))
@@ -137,7 +141,7 @@
   };
 
   document.querySelectorAll('.inputs').forEach((slider) => {
-    slider.addEventListener('change', calculate);
+    slider.addEventListener('input', calculate);
   });
 
   document.querySelectorAll('.freq-btn').forEach((btn) => {
@@ -158,7 +162,7 @@
       if (freq === 'Weekly') {
         const remainYearSavings = weeklyCalc(perCheckSavings) * newAge;
         return returnAPY(total, remainYearSavings, newAge, currCont);
-      } else if (freq === 'Bi-Weekly' || freq === 'Bi-Monthly') {
+      } else if (freq === 'Bi-Weekly' || freq === 'Semi-Monthly') {
         const remainYearSavings = biWeekCalc(perCheckSavings) * newAge;
         return returnAPY(total, remainYearSavings, newAge, currCont);
       } else {
@@ -167,7 +171,6 @@
       }
     } else {
       const diff = total - savings_without_sdf
-      console.log('diff : ', diff);
       return increasePercent = diff / savings_without_sdf;
     }
   }

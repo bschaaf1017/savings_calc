@@ -62,6 +62,11 @@
       </tr>
     </table>
   </div>
+    <p>
+      The power of SDF makes you
+      <span id="res-percent">27%</span>
+      more resiliant than 47% of americans
+    </p>
 </div>
 
 <script>
@@ -131,6 +136,8 @@
     console.log('333333:', employee_contribution3)
     const savings_with_sdf = savings_without_sdf + employer_contribution;
     const sdf_intrest = calcAPY(savings_with_sdf, q, f, s, employer_contribution, savings_without_sdf)
+    const resilliant_num = savings_with_sdf / 250;
+    console.log('resilliant_num: ', resilliant_num)
 
     set('employee-contribution-without', format(savings_without_sdf))
     set('employee-contribution-with', format(savings_without_sdf))
@@ -379,5 +386,10 @@
   td {
     padding: 5px;
     text-align: center
+  }
+
+  .res-container {
+    display: flex;
+    flex-direction: column
   }
 </style>

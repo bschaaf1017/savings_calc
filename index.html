@@ -62,7 +62,7 @@
       </tr>
     </table>
   </div>
-    <p>
+    <p class="res-container">
       The power of SDF makes you
       <span id="res-percent">27%</span>
       more resiliant than 47% of americans
@@ -97,6 +97,7 @@
 
     if (is_pointer_event) {
       f = event.target.value
+
       const currClicked = new Promise((resolve, reject) => {
         const ele = document.getElementsByClassName('btn-clicked')
         resolve(ele)
@@ -144,7 +145,8 @@
     set('employer-contribution', format(employer_contribution));
     set('savings-without-sdf', format(savings_without_sdf));
     set('savings-with-sdf', format(savings_with_sdf));
-    set('sdf-intrest', formatPercent(sdf_intrest))
+    set('sdf-intrest', formatPercent(sdf_intrest));
+    set('res-percent', formatPercent(resilliant_num))
   };
 
   document.querySelectorAll('.inputs').forEach((slider) => {
@@ -199,6 +201,7 @@
   .savings-calculator {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-around;
     padding: 25px 0;
     border: 2px solid #ffa926;
@@ -389,7 +392,13 @@
   }
 
   .res-container {
-    display: flex;
-    flex-direction: column
+    /* display: flex;
+    flex-direction: column; */
+    margin-bottom: auto;
+    text-align: center;
+    color: #ffa926;
+  }
+  #res-percent {
+    color: #004462;
   }
 </style>

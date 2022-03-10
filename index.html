@@ -1,3 +1,4 @@
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
 <div id="employee-calculator" class="savings-calculator">
   <div id="inputs" class="input-wrapper">
     <div class="calculator-input-group">
@@ -67,8 +68,8 @@
       <span id="res-percent">27%</span>
       more resiliant than 47% of americans
     </p>
+    <canvas id="myChart" width="400" height="400"></canvas>
 </div>
-
 <script>
   let f = 'Weekly';
 
@@ -136,7 +137,9 @@
     const employee_contribution3 = savings_without_sdf * .05
     console.log('333333:', employee_contribution3)
     const savings_with_sdf = savings_without_sdf + employer_contribution;
-    const sdf_intrest = calcAPY(savings_with_sdf, q, f, s, employer_contribution, savings_without_sdf)
+    // const sdf_intrest = calcAPY(savings_with_sdf, q, f, s, employer_contribution, savings_without_sdf)
+    const sdf_intrest = CAGR(savings_without_sdf, savings_with_sdf, q)
+    console.log('sdf_interest : ', sdf_intrest)
     const resilliant_num = savings_with_sdf / 250;
     console.log('resilliant_num: ', resilliant_num)
 
@@ -164,6 +167,11 @@
     }));
   });
 
+  function CAGR(startVAl, endingValue, age) {
+    const numOfPeriods = age / 3
+    var CAGR = Math.pow((endingValue / startVAl), 1.05 / numOfPeriods) - 1;
+  return Math.round(CAGR * 10000) / 100;
+  }
   function calcAPY(total, age, freq, perCheckSavings, currCont, savings_without_sdf) {
     console.log('total: ', total, 'age: ', age, 'freq: ', freq, 'perCheckSavings: ', perCheckSavings);
     if (age < 12) {
@@ -190,6 +198,67 @@
     const estimateYearlySavings = remainEmployerCont + restOfyearSavings + totalSoFar;
     return (estimateYearlySavings - (estimateYearlySavings - totalYearEmployerCont)) / (estimateYearlySavings - totalYearEmployerCont);
   }
+
+  const colors = {
+    green: {
+      fill: '#e0eadf',
+      stroke: '#5eb84d',
+    },
+    lightBlue: {
+      stroke: '#6fccdd',
+    },
+    darkBlue: {
+      fill: '#92bed2',
+      stroke: '#3282bf',
+    },
+    purple: {
+      fill: '#8fa8c8',
+      stroke: '#75539e',
+    },
+  };
+  const empData = [100,200, 300, 500, 1000]
+  const ctx = document.getElementById('myChart').getContext('2d');
+  const myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['year one', 'year 2', 'year 3', 'year 4', 'year 5'],
+      datasets: [
+        {
+          label: 'Employee contributions',
+          fill: true,
+          backgroundColor: colors.purple.fill,
+          pointBackgroundColor: colors.purple.stroke,
+          borderColor: colors.purple.stroke,
+          pointHighlightStroke: colors.purple.stroke,
+          borderCapStyle: 'butt',
+          data: empData,
+        },
+        {
+          label: 'Employer contributions',
+          fill: true,
+          backgroundColor: colors.darkBlue.fill,
+          pointBackgroundColor: colors.darkBlue.stroke,
+          borderColor: colors.darkBlue.stroke,
+          pointHighlightStroke: colors.darkBlue.stroke,
+          borderCapStyle: 'butt',
+          data: [empData[0] + 20,empData[1]+40,empData[2] +60,empData[3] + 100,empData[4]+ 200],
+        },
+      ]
+    },
+    options: {
+    responsive: false,
+    // Can't just just `stacked: true` like the docs say
+    scales: {
+      yAxes: [{
+        stacked: true,
+      }]
+    },
+    animation: {
+      duration: 750,
+    },
+  }
+});
+
 
 </script>
 
@@ -394,6 +463,8 @@
   .res-container {
     /* display: flex;
     flex-direction: column; */
+    flex-basis: 100%;
+    height: 0;
     margin-bottom: auto;
     text-align: center;
     color: #ffa926;

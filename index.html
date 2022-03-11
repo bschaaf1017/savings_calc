@@ -2,8 +2,7 @@
 <div id="employee-calculator" class="savings-calculator">
   <div id="inputs" class="input-wrapper">
     <div class="calculator-input-group">
-
-      <label>Paycheck Frequency</label><br>
+      <label>Paycheck Frequency:</label><br><br>
       <div class="btn-group">
         <button id="freq-btn1" class="freq-btn btn-clicked" value=4>Weekly</button>
         <button id="freq-btn2" class="freq-btn" value=2.1>Bi-Weekly</button>
@@ -12,92 +11,140 @@
       </div>
     </div>
     <p class="calculator-input-group">
-      <label>Amount saved per paycheck:</label><br>
+      <label>Amount saved per paycheck:</label><br><br>
       <input id="paycheck-savings" class="calculator-slider inputs" data-is-currency="true" type="range" min="1"
         max="250" value="5">
       <span id="paycheck-savings-value">$5.00</span>
     </p>
-    <!-- <p class="calculator-input-group">
-      <label>Age of Sunny Day Fund®:</label><br>
-      <input id="sdf-age" class="calculator-slider inputs" type="range" min="3" max="60" step="3" value="9">
-      <span id="sdf-age-value">9</span> months
-    </p> -->
   </div>
-  <!-- <div id="result-table" class="result-table">
-    <table>
-      <colgroup>
-        <col>
-        <col class="col1" span="1">
-        <col>
-        <col class="col2" span="1">
-      </colgroup>
-      <tr>
-        <th></th>
-        <th class="top-left">Without SDF</th>
-        <th></th>
-        <th class="top-right">With SDF</th>
-      </tr>
-      <tr>
-        <th>Employee Contribution:</td>
-        <td id="employee-contribution-without">$180.00</td>
-        <th></th>
-        <td id="employee-contribution-with">$180.00</td>
-      </tr>
-      <tr>
-        <th>Employer Contribution:</td>
-        <td>$0</td>
-        <th></th>
-        <td id="employer-contribution">$28.37</td>
-      </tr>
-      <tr>
-        <th>Total Savings Potential:</th>
-        <td id="savings-without-sdf">$180.00</td>
-        <th></th>
-        <td id="savings-with-sdf">$208.37</td>
-      </tr>
-      <tr>
-        <th><strong>Effective Interest Rate (APY):</strong></th>
-        <td class="bottom-left">0%</td>
-        <th></th>
-        <td id="sdf-intrest" class="bottom-right">13.62%</td>
-      </tr>
-    </table>
-  </div> -->
-  <canvas id="myChart" width="300" height="400"></canvas>
-  <p class="res-container">
-    The power of SDF makes you
-    <span id="res-percent">27%</span>
-    more resiliant than 47% of americans
-  </p>
+  <div class="chart-container">
+    <canvas id="myChart"></canvas>
+  </div>
+  <div class="res-container">
+    <p class="sdf-power">
+      The power of SDF makes you
+      <strong><span id="res-percent"></span></strong>
+      times more resiliant than 47% of americans
+    </p>
+    <p class="disclaimer">
+      Figures are calculated assuming your employer chooses 5% base
+      reward and an annual max reward of $500.
+    </p>
+  </div>
 </div>
 <script>
-  let f = 4;
+  let freq = 4;
 
+  const colors = {
+    orange: {
+      fill: '#fcb74e',
+      stroke: '#ff9b03',
+    },
+    grey: {
+      fill: '#bdbdbd',
+      stroke: '#919191',
+    },
+  };
+
+  const ctx = document.getElementById('myChart').getContext('2d');
+  const myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [
+        `Year 1, 5.26% APY`,
+        `Year 2, 2.59% APY`,
+        `Year 3, 1.72% APY`,
+        `Year 4, 1.29% APY`,
+        `Year 5, 1.03% APY`
+      ],
+      datasets: [
+        {
+          label: 'Without Sunny Day Fund',
+          fill: true,
+          backgroundColor: colors.grey.fill,
+          pointBackgroundColor: colors.grey.stroke,
+          borderColor: colors.grey.stroke,
+          pointHighlightStroke: colors.grey.stroke,
+          borderCapStyle: 'butt',
+          data: [240, 480, 720, 960, 1200],
+        },
+        {
+          label: 'With Sunny Day Fund',
+          fill: true,
+          backgroundColor: colors.orange.fill,
+          pointBackgroundColor: colors.orange.stroke,
+          borderColor: colors.orange.stroke,
+          pointHighlightStroke: colors.orange.stroke,
+          borderCapStyle: 'butt',
+          data: [291.72150000000005, 583.4430000000001, 875.1645000000002, 1166.8860000000002, 1458.6075000000003],
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      aspectRatio: 1,
+      animation: {
+        duration: 750,
+      },
+    }
+  });
+
+  // get DOM element
   const get = id => document.getElementById(id).value;
+  // set new text value for Dom element
   const set = (id, value) => document.getElementById(id).innerText = value;
-
+  // format $
   const format = number => new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD'
   }).format(number);
-
+  // format %
   const formatPercent = num => new Intl.NumberFormat('default', {
     style: 'percent',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(num);
-
-  const weeklyCalc = amt => amt * 4;
-  const biWeekCalc = amt => amt * 2;
-  const calcAnnualWithout = amt => amt * 12;
-  const monthlyContribution = (cont, age) => cont / age
+  // create array of emloyees contributions for 5 years
+  const yearlyEmpCont = (checkSavings, payFreq) => {
+    const yearlySavings = [];
+    for (let i = 1; i <= 5; i++) {
+      let numMonths = i * 12;
+      yearlySavings.push(payFreq * checkSavings * numMonths);
+    }
+    return yearlySavings;
+  }
+  // create array of yearly savings including employers rewards over 5 years
+  const rewards = (empsConts) => {
+    return withRewards = empsConts.map(cont => {
+      if ((cont * (1.05 ** 4)) - cont > 500) {
+        return cont + 500
+      } else {
+        return cont * (1.05 ** 4)
+      }
+    })
+  }
+  // calculate compounded interest rate for each year
+  const CAGR = (startVals, endVals) => {
+    return startVals.map((val, idx) => {
+      const numPeriods = (idx + 1) * 4
+      const compounded = Math.pow((endVals[idx] / val), 1.05 / numPeriods) - 1;
+      return `Year ${idx + 1}, ${Math.round(compounded * 10000) / 100}% APY`;
+    })
+  }
+  // calculate average savings over 5 years to get resilliance %
+  const resiliant = (endVals) => {
+    const total = endVals.reduce((acc, current)=>acc+current, 0);
+    console.log('total: ', total)
+    const average = total / 5;
+    return (average / 250).toFixed(2);
+  }
 
   const calculate = (event) => {
-    const is_pointer_event = event instanceof PointerEvent
+
+    const is_pointer_event = event instanceof PointerEvent || event instanceof MouseEvent
 
     if (is_pointer_event) {
-      console.log('event: ', event.target.value)
-      f = event.target.value
+      freq = event.target.value
 
       const currClicked = new Promise((resolve, reject) => {
         const ele = document.getElementsByClassName('btn-clicked')
@@ -112,55 +159,35 @@
         .catch((err) => console.log('error:', err));
     }
 
-    const display_elem_id = `${event.target.id}-value`;
-    const is_currency_field = Boolean(event.target.dataset.isCurrency);
-    const formatted_value = is_currency_field ? format(event.target.value) : event.target.value;
 
     if (event.target.children.length === 0 && !is_pointer_event) {
+      const display_elem_id = `${event.target.id}-value`;
+      const is_currency_field = Boolean(event.target.dataset.isCurrency);
+      const formatted_value = is_currency_field ? format(event.target.value) : event.target.value;
       set(display_elem_id, formatted_value);
     }
 
-    const s = get('paycheck-savings');
-    const q = 12;
+    const savings = get('paycheck-savings');
 
-    const monthlySavings =
-     //if pay freq is weekly return savings * 4
-      f === 'Weekly' ? weeklyCalc(s)
-      // if everyother week return savings * 2 else return savings
-        : f === 'Bi-Weekly' || f === 'Semi-Monthly'
-          ? biWeekCalc(s) : s;
-
-    const dailySavings = monthlySavings / 30;
-
-    const yearlyEmpCont = () => {
-      const yearlySavings = []
-      for (let i = 1; i <= 5; i++) {
-        let numMonths = i * 12
-        yearlySavings.push(f * s * numMonths)
-      }
-      console.log('yearly savings===',yearlySavings)
-    }
-    yearlyEmpCont()
-
-    const savings_without_sdf = monthlySavings * q;
-    const employer_contribution = (savings_without_sdf * (1.05 ** (q / 3))) - savings_without_sdf;
-    const employee_contribution3 = savings_without_sdf * .05
-    console.log('333333:', employee_contribution3)
-    const savings_with_sdf = savings_without_sdf + employer_contribution;
-    // const sdf_intrest = calcAPY(savings_with_sdf, q, f, s, employer_contribution, savings_without_sdf)
-    const sdf_intrest = CAGR(savings_without_sdf, savings_with_sdf, q)
+    const savings_without_sdf = yearlyEmpCont(savings, freq)
+    console.log('no rewards=== ', savings_without_sdf)
+    // const employer_contribution = (savings_without_sdf * (1.05 ** (q / 3))) - savings_without_sdf;
+    const with_employer_rewards = rewards(savings_without_sdf);
+    console.log('with rewards = ', with_employer_rewards)
+    const sdf_intrest = CAGR(savings_without_sdf, with_employer_rewards)
     console.log('sdf_interest : ', sdf_intrest)
-    const resilliant_num = savings_with_sdf / 250;
+    const resilliant_num = resiliant(with_employer_rewards);
     console.log('resilliant_num: ', resilliant_num)
 
-    set('employee-contribution-without', format(savings_without_sdf))
-    set('employee-contribution-with', format(savings_without_sdf))
-    set('employer-contribution', format(employer_contribution));
-    set('savings-without-sdf', format(savings_without_sdf));
-    set('savings-with-sdf', format(savings_with_sdf));
-    set('sdf-intrest', formatPercent(sdf_intrest));
-    set('res-percent', formatPercent(resilliant_num))
+
+    myChart.data.labels = sdf_intrest;
+    myChart.data.datasets[0].data = savings_without_sdf;
+    myChart.data.datasets[1].data = with_employer_rewards;
+    myChart.update();
+
+    set('res-percent', resilliant_num)
   };
+
 
   document.querySelectorAll('.inputs').forEach((slider) => {
     slider.addEventListener('input', calculate);
@@ -177,97 +204,7 @@
     }));
   });
 
-  function CAGR(startVAl, endingValue, age) {
-    const numOfPeriods = age / 3
-    var CAGR = Math.pow((endingValue / startVAl), 1.05 / numOfPeriods) - 1;
-  return Math.round(CAGR * 10000) / 100;
-  }
-  function calcAPY(total, age, freq, perCheckSavings, currCont, savings_without_sdf) {
-    console.log('total: ', total, 'age: ', age, 'freq: ', freq, 'perCheckSavings: ', perCheckSavings);
-    if (age < 12) {
-      const newAge = 12 - age;
-      if (freq === 'Weekly') {
-        const remainYearSavings = weeklyCalc(perCheckSavings) * newAge;
-        return returnAPY(total, remainYearSavings, newAge, currCont);
-      } else if (freq === 'Bi-Weekly' || freq === 'Semi-Monthly') {
-        const remainYearSavings = biWeekCalc(perCheckSavings) * newAge;
-        return returnAPY(total, remainYearSavings, newAge, currCont);
-      } else {
-        const remainYearSavings = perCheckSavings * newAge;
-        return returnAPY(total, remainYearSavings, newAge, currCont);
-      }
-    } else {
-      const diff = total - savings_without_sdf
-      return increasePercent = diff / savings_without_sdf;
-    }
-  }
 
-  function returnAPY(totalSoFar, restOfyearSavings, remainingMonths, currCont) {
-    const remainEmployerCont = (restOfyearSavings * (1.05 ** (remainingMonths / 3))) - restOfyearSavings;
-    const totalYearEmployerCont = remainEmployerCont + currCont;
-    const estimateYearlySavings = remainEmployerCont + restOfyearSavings + totalSoFar;
-    return (estimateYearlySavings - (estimateYearlySavings - totalYearEmployerCont)) / (estimateYearlySavings - totalYearEmployerCont);
-  }
-
-  const colors = {
-    green: {
-      fill: '#e0eadf',
-      stroke: '#5eb84d',
-    },
-    lightBlue: {
-      stroke: '#6fccdd',
-    },
-    darkBlue: {
-      fill: '#92bed2',
-      stroke: '#3282bf',
-    },
-    purple: {
-      fill: '#8fa8c8',
-      stroke: '#75539e',
-    },
-  };
-  const empData = [100,200, 300, 500, 1000]
-  const ctx = document.getElementById('myChart').getContext('2d');
-  const myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
-      datasets: [
-        {
-          label: 'Employee contributions',
-          fill: true,
-          backgroundColor: colors.purple.fill,
-          pointBackgroundColor: colors.purple.stroke,
-          borderColor: colors.purple.stroke,
-          pointHighlightStroke: colors.purple.stroke,
-          borderCapStyle: 'butt',
-          data: empData,
-        },
-        {
-          label: 'Total with Employer contributions',
-          fill: true,
-          backgroundColor: colors.darkBlue.fill,
-          pointBackgroundColor: colors.darkBlue.stroke,
-          borderColor: colors.darkBlue.stroke,
-          pointHighlightStroke: colors.darkBlue.stroke,
-          borderCapStyle: 'butt',
-          data: [empData[0] + 20,empData[1]+40,empData[2] +60,empData[3] + 100,empData[4]+ 200],
-        },
-      ]
-    },
-    options: {
-    responsive: false,
-    // Can't just just `stacked: true` like the docs say
-    scales: {
-      yAxes: [{
-        stacked: true,
-      }]
-    },
-    animation: {
-      duration: 750,
-    },
-  }
-});
 
 
 </script>
@@ -278,6 +215,7 @@
   }
 
   .savings-calculator {
+    max-width: 1000px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -289,7 +227,7 @@
   .input-wrapper {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-around;
   }
 
   .btn-group {
@@ -379,6 +317,12 @@
     font-weight: bolder;
   }
 
+  .chart-container {
+    position: relative;
+    height: auto;
+    width:50%
+  }
+
   @media only screen and (max-width: 800px) {
     .savings-calculator {
       display: block;
@@ -395,10 +339,10 @@
 
     .btn-group {
       width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-  }
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+    }
 
     .calculator-input-group {
       white-space: normal;
@@ -422,6 +366,11 @@
       margin-bottom: 14px;
     }
 
+    .chart-container {
+      position: relative;
+      height: auto;
+      width:100%
+    }
   }
 
   @media only screen and (max-width: 730px) {
@@ -436,48 +385,22 @@
     }
   }
 
-  .result-table {
-    display: flex;
-    justify-content: center;
-  }
-
-  table {
-    border: none;
-    border-collapse: collapse;
-  }
-
-  .col1 {
-    border: 2px solid #c9cccc;
-  }
-
-  .col2 {
-    border: 2px solid #ffa926;
-  }
-
-  .top-left {
-    background-color: #c9cccc;
-    color: white;
-  }
-
-  .top-right {
-    background-color: #ffa926;
-    color: white;
-  }
-
-  th,
-  td {
-    padding: 5px;
-    text-align: center
-  }
 
   .res-container {
     /* display: flex;
     flex-direction: column; */
     flex-basis: 100%;
-    height: 0;
-    margin-bottom: auto;
+    /* height: 0; */
+
+  }
+  .sdf-power {
     text-align: center;
     color: #ffa926;
+  }
+  .disclaimer {
+    text-align: center;
+    color: #000;
+    font-size: 12px;
   }
   #res-percent {
     color: #004462;

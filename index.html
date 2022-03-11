@@ -28,7 +28,8 @@
     </p>
     <p class="disclaimer">
       Figures are calculated assuming your employer chooses 5% base
-      reward and an annual max reward of $500.
+      reward and an annual max reward of $500. Actual rates and rewards
+      may vary.
     </p>
   </div>
 </div>
@@ -126,6 +127,7 @@
   // calculate compounded interest rate for each year
   const CAGR = (startVals, endVals) => {
     return startVals.map((val, idx) => {
+      // val = Number.parseFloat(val)
       const numPeriods = (idx + 1) * 4
       const compounded = Math.pow((endVals[idx] / val), 1.05 / numPeriods) - 1;
       return `Year ${idx + 1}, ${Math.round(compounded * 10000) / 100}% APY`;
@@ -133,7 +135,7 @@
   }
   // calculate average savings over 5 years to get resilliance %
   const resiliant = (endVals) => {
-    const total = endVals.reduce((acc, current)=>acc+current, 0);
+    const total = endVals.reduce((acc, current)=> acc + Number.parseFloat(current), 0);
     console.log('total: ', total)
     const average = total / 5;
     return (average / 250).toFixed(2);

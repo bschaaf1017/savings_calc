@@ -76,7 +76,7 @@
           borderColor: colors.orange.stroke,
           pointHighlightStroke: colors.orange.stroke,
           borderCapStyle: 'butt',
-          data: [291.72150000000005, 583.4430000000001, 875.1645000000002, 1166.8860000000002, 1458.6075000000003],
+          data: [291.72, 583.44, 875.16, 1166.88, 1458.60],
         },
       ]
     },
@@ -117,9 +117,9 @@
   const rewards = (empsConts) => {
     return withRewards = empsConts.map(cont => {
       if ((cont * (1.05 ** 4)) - cont > 500) {
-        return cont + 500
+        return (cont + 500).toFixed(2);
       } else {
-        return cont * (1.05 ** 4)
+        return (cont * (1.05 ** 4)).toFixed(2);
       }
     })
   }

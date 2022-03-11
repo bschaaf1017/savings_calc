@@ -5,10 +5,10 @@
 
       <label>Paycheck Frequency</label><br>
       <div class="btn-group">
-        <button id="freq-btn1" class="freq-btn btn-clicked" value="Weekly">Weekly</button>
-        <button id="freq-btn2" class="freq-btn" value="Bi-Weekly">Bi-Weekly</button>
-        <button id="freq-btn3" class="freq-btn" value="Semi-Monthly">Semi-Monthly</button>
-        <button id="freq-btn4" class="freq-btn" value="Monthly">Monthly</button>
+        <button id="freq-btn1" class="freq-btn btn-clicked" value=4>Weekly</button>
+        <button id="freq-btn2" class="freq-btn" value=2.1>Bi-Weekly</button>
+        <button id="freq-btn3" class="freq-btn" value=2>Semi-Monthly</button>
+        <button id="freq-btn4" class="freq-btn" value=1>Monthly</button>
       </div>
     </div>
     <p class="calculator-input-group">
@@ -17,13 +17,13 @@
         max="250" value="5">
       <span id="paycheck-savings-value">$5.00</span>
     </p>
-    <p class="calculator-input-group">
+    <!-- <p class="calculator-input-group">
       <label>Age of Sunny Day Fund®:</label><br>
       <input id="sdf-age" class="calculator-slider inputs" type="range" min="3" max="60" step="3" value="9">
       <span id="sdf-age-value">9</span> months
-    </p>
+    </p> -->
   </div>
-  <div id="result-table" class="result-table">
+  <!-- <div id="result-table" class="result-table">
     <table>
       <colgroup>
         <col>
@@ -62,16 +62,16 @@
         <td id="sdf-intrest" class="bottom-right">13.62%</td>
       </tr>
     </table>
-  </div>
-    <p class="res-container">
-      The power of SDF makes you
-      <span id="res-percent">27%</span>
-      more resiliant than 47% of americans
-    </p>
-    <canvas id="myChart" width="400" height="400"></canvas>
+  </div> -->
+  <canvas id="myChart" width="300" height="400"></canvas>
+  <p class="res-container">
+    The power of SDF makes you
+    <span id="res-percent">27%</span>
+    more resiliant than 47% of americans
+  </p>
 </div>
 <script>
-  let f = 'Weekly';
+  let f = 4;
 
   const get = id => document.getElementById(id).value;
   const set = (id, value) => document.getElementById(id).innerText = value;
@@ -94,9 +94,9 @@
 
   const calculate = (event) => {
     const is_pointer_event = event instanceof PointerEvent
-    console.log('evernt: ', event)
 
     if (is_pointer_event) {
+      console.log('event: ', event.target.value)
       f = event.target.value
 
       const currClicked = new Promise((resolve, reject) => {
@@ -121,7 +121,7 @@
     }
 
     const s = get('paycheck-savings');
-    const q = get('sdf-age');
+    const q = 12;
 
     const monthlySavings =
      //if pay freq is weekly return savings * 4
@@ -131,6 +131,16 @@
           ? biWeekCalc(s) : s;
 
     const dailySavings = monthlySavings / 30;
+
+    const yearlyEmpCont = () => {
+      const yearlySavings = []
+      for (let i = 1; i <= 5; i++) {
+        let numMonths = i * 12
+        yearlySavings.push(f * s * numMonths)
+      }
+      console.log('yearly savings===',yearlySavings)
+    }
+    yearlyEmpCont()
 
     const savings_without_sdf = monthlySavings * q;
     const employer_contribution = (savings_without_sdf * (1.05 ** (q / 3))) - savings_without_sdf;
@@ -221,7 +231,7 @@
   const myChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ['year one', 'year 2', 'year 3', 'year 4', 'year 5'],
+      labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
       datasets: [
         {
           label: 'Employee contributions',
@@ -234,7 +244,7 @@
           data: empData,
         },
         {
-          label: 'Employer contributions',
+          label: 'Total with Employer contributions',
           fill: true,
           backgroundColor: colors.darkBlue.fill,
           pointBackgroundColor: colors.darkBlue.stroke,

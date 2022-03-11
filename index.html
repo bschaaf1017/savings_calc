@@ -4,10 +4,10 @@
     <div class="calculator-input-group">
       <label>Paycheck Frequency:</label><br><br>
       <div class="btn-group">
-        <button id="freq-btn1" class="freq-btn btn-clicked" value=4>Weekly</button>
-        <button id="freq-btn2" class="freq-btn" value=2.1>Bi-Weekly</button>
-        <button id="freq-btn3" class="freq-btn" value=2>Semi-Monthly</button>
-        <button id="freq-btn4" class="freq-btn" value=1>Monthly</button>
+        <button id="freq-btn1" class="freq-btn btn-clicked" value=52>Weekly</button>
+        <button id="freq-btn2" class="freq-btn" value=26>Bi-Weekly</button>
+        <button id="freq-btn3" class="freq-btn" value=24>Semi-Monthly</button>
+        <button id="freq-btn4" class="freq-btn" value=12>Monthly</button>
       </div>
     </div>
     <p class="calculator-input-group">
@@ -109,8 +109,7 @@
   const yearlyEmpCont = (checkSavings, payFreq) => {
     const yearlySavings = [];
     for (let i = 1; i <= 5; i++) {
-      let numMonths = i * 12;
-      yearlySavings.push(payFreq * checkSavings * numMonths);
+      yearlySavings.push(payFreq * checkSavings * i);
     }
     return yearlySavings;
   }

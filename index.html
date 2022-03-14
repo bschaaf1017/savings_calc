@@ -24,7 +24,7 @@
   <div class="res-container">
     <p class="sdf-power">
       The power of SDF makes you
-      <strong><span id="res-percent">3.79</span></strong>
+      <strong><span id="res-percent"></span></strong>
       times more resilient than 47% of americans
     </p>
     <p class="disclaimer">
@@ -170,7 +170,7 @@
     }
 
     const savings = get('paycheck-savings');
-		console.log('savings: ', savings, ' freq: ', freq)
+
     const savings_without_sdf = yearlyEmpCont(savings, freq)
     console.log('no rewards=== ', savings_without_sdf)
     // const employer_contribution = (savings_without_sdf * (1.05 ** (q / 3))) - savings_without_sdf;
@@ -207,12 +207,14 @@
   });
 
 
+
+
 </script>
 
 <style>
   .savings-calculator * {
     font-family: Montserrat, sans-serif;
-  } */
+  }
 
   .savings-calculator {
     max-width: 1000px;

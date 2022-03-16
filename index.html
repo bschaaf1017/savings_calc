@@ -14,7 +14,7 @@
     <p class="calculator-input-group">
       <label>Amount saved per paycheck:</label><br><br>
       <input id="paycheck-savings" class="calculator-slider inputs" data-is-currency="true" type="range" min="1"
-        max="250" value="5">
+        max="250" value="62">
       <span id="paycheck-savings-value">$5.00</span>
     </p>
   </div>
@@ -23,7 +23,7 @@
   </div>
   <div class="res-container">
     <p class="sdf-power">
-      The power of Sunny Day Fund makes you
+      Within a single year, the power of Sunny Day Fund makes you
       <strong><span id="res-percent-one" class="res-percent"></span></strong>
       more resilient than nearly half of America.
       By the end of year 3, you could be
@@ -33,6 +33,13 @@
     <p class="disclaimer">
       Calculations based on employers rewarding you up to $400 at more than 20% annualized interest rate.
       Your employer may choose to do even more!
+    </p>
+    <p class="disclaimer">
+      As represented by the "Without Sunny Day Fund" area, a savers attempts to save money while making the same
+      per pay period contributions to a savings account linked to their main checking account with only a 0.003%
+      national average savings interest rate is also much more likey to be tempeted to spend the money at a rate of 25%
+      per quarter.
+
     </p>
   </div>
 </div>
@@ -50,7 +57,7 @@
     },
   };
   const labels = [
-        `O`,
+        '',
         `Q1`,
         `Q2`,
         `Q3`,
@@ -129,92 +136,56 @@
 
   // create array of emloyees contributions for 3 years for each quarter
   const quarterEmpCont = (checkSavings, payFreq) => {
+    const quarterlySavings = checkSavings * payFreq
     const amounts = {
-      sdfSavings: [],
-      regeSavings: [],
-      quarterly: []
-    }
-    for (let i = 0; i <= 12; i++) {
-      const quarterlySavings = payFreq * checkSavings * i
-      const fivePercent = quarterlySavings * .05;
-      const perQuarterSavings = payFreq * checkSavings;
-      amounts.quarterly.push(quarterlySavings)
-      if (i === 0) {
-        amounts.sdfSavings.push(0)
-        amounts.regeSavings.push(0);
-      } else if (i === 4) {
-        let withSdf;
-        let withoutSdf = quarterlySavings - (quarterlySavings * .25)
-        if (fivePercent > 100) {
-          withSdf = (quarterlySavings + 100);
-        } else {
-          withSdf = (quarterlySavings * 1.05);
-        }
-        // add regular quarter end amt
-        amounts.sdfSavings.push(withSdf);
-        amounts.regeSavings.push(withoutSdf);
-        // add withdrawl amt
-        amounts.sdfSavings.push(withSdf  - (withSdf * .5));
-        amounts.regeSavings.push(withoutSdf - (withoutSdf * .5));
-      } else if (i === 10) {
-        let currSdfSavings = amounts.sdfSavings[i]
-        let currWithout = amounts.regeSavings[i]
-        let tempQuarterWith = perQuarterSavings + currSdfSavings;
-        let tempQuarterWithout = perQuarterSavings + currWithout;
-        let withSdf;
-        let withoutSdf = tempQuarterWithout - (currWithout * .25);
-        if (tempQuarterWith * .05 > 100) {
-          withSdf = (tempQuarterWith + 100);
-        } else {
-          withSdf = tempQuarterWith * 1.05;
-        }
-        // add regular quarter end amt
-        amounts.sdfSavings.push(withSdf);
-        amounts.regeSavings.push(withoutSdf);
-        // add withdrawl amt
-        amounts.sdfSavings.push(withSdf  - (withSdf * .25));
-        amounts.regeSavings.push(withoutSdf - (withoutSdf * .25));
-      } else if (i > 4 && i < 10) {
-        let currSdfSavings = amounts.sdfSavings[i]
-        let currWithout = amounts.regeSavings[i]
-        let tempQuarterWith = perQuarterSavings + currSdfSavings;
-        let tempQuarterWithout = perQuarterSavings + currWithout;
-        let withSdf;
-        let withoutSdf = tempQuarterWithout - (currWithout * .25);
-        if (tempQuarterWith * .05 > 100) {
-          withSdf = tempQuarterWith + 100;
-        } else {
-          withSdf = tempQuarterWith * 1.05;
-        }
-        amounts.sdfSavings.push(withSdf);
-        amounts.regeSavings.push(withoutSdf);
-      } else if (i > 10) {
-        let currSdfSavings = amounts.sdfSavings[i + 1]
-        let currWithout = amounts.regeSavings[i + 1]
-        let tempQuarterWith = perQuarterSavings + currSdfSavings;
-        let tempQuarterWithout = perQuarterSavings + currWithout;
-        let withSdf;
-        let withoutSdf = tempQuarterWithout - (currWithout * .25);
-        if (tempQuarterWith * .05 > 100) {
-          withSdf = tempQuarterWith + 100;
-        } else {
-          withSdf = tempQuarterWith * 1.05;
-        }
-        amounts.sdfSavings.push(withSdf);
-        amounts.regeSavings.push(withoutSdf);
-      } else {
-        let withSdf;
-        let withoutSdf = quarterlySavings - (quarterlySavings * .25);
-        if (fivePercent > 100) {
-          withSdf = quarterlySavings + 100;
-        } else {
-          withSdf = quarterlySavings * 1.05;
-        }
-        amounts.sdfSavings.push(withSdf);
-        amounts.regeSavings.push(withoutSdf);
+      checkSavings,
+      payFreq,
+      sdfSavings: [0],
+      quarterlySavings: checkSavings * payFreq
+    };
+    for (let i = 1; i < 15; i++) {
+      if (i === 5) {
+        const prevTotal = amounts.sdfSavings[4];
+        const repair = prevTotal - (prevTotal * .5);
+        amounts.sdfSavings.push(repair);
+      } else if (i === 12) {
+        const prevTotal = amounts.sdfSavings[i - 1];
+        const repair = prevTotal - (prevTotal * .25);
+        amounts.sdfSavings.push(repair);
+      }  else {
+        const prevTotal = amounts.sdfSavings[i - 1];
+        const interest = (prevTotal + quarterlySavings) * .05
+        const withInt =
+        interest >= 100
+          ? 100 + prevTotal + quarterlySavings
+          : prevTotal + quarterlySavings + interest;
+        amounts.sdfSavings.push(withInt);
       }
     }
     return amounts;
+  }
+  // calculate rege savings/ spending
+  const regeSavings = (obj) => {
+    obj.newRege = [0];
+    const { quarterlySavings } = obj;
+
+    for (let i = 1; i < 15; i++) {
+      if (i === 5) {
+        const prevTotal = obj.newRege[4];
+        const repair = prevTotal - (prevTotal * .5)
+        obj.newRege.push(repair)
+      } else if (i === 12) {
+        const prevTotal = obj.newRege[11];
+        const repair = prevTotal - (prevTotal * .25)
+        obj.newRege.push(repair)
+      } else {
+        const prevTotal = obj.newRege[i - 1]
+        const withInt = (prevTotal + quarterlySavings) * 1.0003;
+        const withWithdrawl = withInt - (withInt * .25)
+        obj.newRege.push(withWithdrawl)
+      }
+    }
+    return obj;
   }
   // calculate compounded interest rate for each quarter
   const CAGR = (startVals, endVals) => {
@@ -274,19 +245,11 @@
 
     const contributionTotals = quarterEmpCont(savings, freq)
     console.log('totals: ', contributionTotals)
-    // const withNoSdf = withoutSDF(contributionTotals)
-    // const with_employer_rewards = rewards(contributionTotals);
-    // console.log('with rewards = ', with_employer_rewards)
-    // const sdf_intrest = CAGR(savings_without_sdf, with_employer_rewards)
-    // console.log('sdf_interest : ', sdf_intrest)
+    const rege = regeSavings(contributionTotals)
     const resilliant_nums = resiliant(contributionTotals.sdfSavings);
     console.log('res_nums: ', resilliant_nums)
 
-    // console.log('resilliant_num: ', resilliant_num)
-
-
-    // myChart.data.labels = sdf_intrest;
-    myChart.data.datasets[0].data = contributionTotals.regeSavings;
+    myChart.data.datasets[0].data = rege.newRege;
     myChart.data.datasets[1].data = contributionTotals.sdfSavings;
     myChart.update();
 
@@ -341,7 +304,7 @@
     flex-direction: row;
     /* justify-content: space-between; */
     /* width: auto; */
-    gap: 14px;
+    gap: 15px;
   }
 
   .freq-btn {

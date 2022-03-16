@@ -4,11 +4,11 @@
     <div class="calculator-input-group">
       <label>Paycheck Frequency:</label><br><br>
       <div class="btn-group">
-        <!-- the value for each of these buttons represents how many paychecks someone would recieve in one year at that pay frequency -->
-        <button id="freq-btn1" class="freq-btn btn-clicked" value=52>Weekly</button>
-        <button id="freq-btn2" class="freq-btn" value=26>Bi-Weekly</button>
-        <button id="freq-btn3" class="freq-btn" value=24>Semi-Monthly</button>
-        <button id="freq-btn4" class="freq-btn" value=12>Monthly</button>
+        <!-- the value for each of these buttons represents how many paychecks someone would recieve in one quarter at that pay frequency -->
+        <button id="freq-btn1" class="freq-btn btn-clicked" value=13>Weekly</button>
+        <button id="freq-btn2" class="freq-btn" value=6.25>Bi-Weekly</button>
+        <button id="freq-btn3" class="freq-btn" value=6>Semi-Monthly</button>
+        <button id="freq-btn4" class="freq-btn" value=4>Monthly</button>
       </div>
     </div>
     <p class="calculator-input-group">
@@ -23,19 +23,21 @@
   </div>
   <div class="res-container">
     <p class="sdf-power">
-      The power of SDF makes you
-      <strong><span id="res-percent"></span></strong>
-      times more resilient than 47% of americans
+      The power of Sunny Day Fund makes you
+      <strong><span id="res-percent-one" class="res-percent"></span></strong>
+      more resilient than nearly half of America.
+      By the end of year 3, you could be
+      <strong><span id="res-percent-three" class="res-percent"></span></strong>
+      more resilient.
     </p>
     <p class="disclaimer">
-      Figures are calculated assuming your employer chooses 5% base
-      reward and an annual max reward of $500. Actual rates and rewards
-      may vary.
+      Calculations based on employers rewarding you up to $400 at more than 20% annualized interest rate.
+      Your employer may choose to do even more!
     </p>
   </div>
 </div>
 <script>
-  let freq = 52;
+  let freq = 13;
 
   const colors = {
     orange: {
@@ -47,19 +49,37 @@
       stroke: '#919191',
     },
   };
-
+  const labels = [
+        `O`,
+        `Q1`,
+        `Q2`,
+        `Q3`,
+        `Year 1`,
+        `Car Repair (-50%)`,
+        `Q1`,
+        `Q2`,
+        `Q3`,
+        `Year 2`,
+        `Q1`,
+        `Q2`,
+        `Emergency (-25%)`,
+        `Q3`,
+        `Year 3`,
+      ]
   const ctx = document.getElementById('myChart').getContext('2d');
   const myChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: [
-        `Year 1, 5.26% APY`,
-        `Year 2, 2.59% APY`,
-        `Year 3, 1.72% APY`,
-        `Year 4, 1.29% APY`,
-        `Year 5, 1.03% APY`
-      ],
+      labels: labels,
       datasets: [
+        // {
+        //   label: 'Quarterly total without Sunny Day Fund',
+        //   pointBackgroundColor: 'black',
+        //   borderColor: 'black',
+        //   pointHighlightStroke: 'black',
+        //   borderCapStyle: 'butt',
+        //   data: [0, 48.75,97.5,146.25,195,243.75,292.5,341.25,390,438.75,487.5,536.25,585]
+        // },
         {
           label: 'Without Sunny Day Fund',
           fill: true,
@@ -68,7 +88,7 @@
           borderColor: colors.grey.stroke,
           pointHighlightStroke: colors.grey.stroke,
           borderCapStyle: 'butt',
-          data: [240, 480, 720, 960, 1200],
+          data: [0,65,130,195,260,325,390,455,520,585,650,715,780],
         },
         {
           label: 'With Sunny Day Fund',
@@ -78,7 +98,7 @@
           borderColor: colors.orange.stroke,
           pointHighlightStroke: colors.orange.stroke,
           borderCapStyle: 'butt',
-          data: [291.72, 583.44, 875.16, 1166.88, 1458.60],
+          data: [0,68,230,295,360,425,490,555,620,685,750,815,880],
         },
       ]
     },
@@ -106,39 +126,120 @@
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(num);
-  // create array of emloyees contributions for 5 years
-  const yearlyEmpCont = (checkSavings, payFreq) => {
-    const yearlySavings = [];
-    for (let i = 1; i <= 5; i++) {
-      yearlySavings.push(payFreq * checkSavings * i);
+
+  // create array of emloyees contributions for 3 years for each quarter
+  const quarterEmpCont = (checkSavings, payFreq) => {
+    const amounts = {
+      sdfSavings: [],
+      regeSavings: [],
+      quarterly: []
     }
-    return yearlySavings;
-  }
-  // create array of yearly savings including employers rewards over 5 years
-  const rewards = (empsConts) => {
-    return withRewards = empsConts.map(cont => {
-      if ((cont * (1.05 ** 4)) - cont > 500) {
-        return (cont + 500).toFixed(2);
+    for (let i = 0; i <= 12; i++) {
+      const quarterlySavings = payFreq * checkSavings * i
+      const fivePercent = quarterlySavings * .05;
+      const perQuarterSavings = payFreq * checkSavings;
+      amounts.quarterly.push(quarterlySavings)
+      if (i === 0) {
+        amounts.sdfSavings.push(0)
+        amounts.regeSavings.push(0);
+      } else if (i === 4) {
+        let withSdf;
+        let withoutSdf = quarterlySavings - (quarterlySavings * .25)
+        if (fivePercent > 100) {
+          withSdf = (quarterlySavings + 100);
+        } else {
+          withSdf = (quarterlySavings * 1.05);
+        }
+        // add regular quarter end amt
+        amounts.sdfSavings.push(withSdf);
+        amounts.regeSavings.push(withoutSdf);
+        // add withdrawl amt
+        amounts.sdfSavings.push(withSdf  - (withSdf * .5));
+        amounts.regeSavings.push(withoutSdf - (withoutSdf * .5));
+      } else if (i === 10) {
+        let currSdfSavings = amounts.sdfSavings[i]
+        let currWithout = amounts.regeSavings[i]
+        let tempQuarterWith = perQuarterSavings + currSdfSavings;
+        let tempQuarterWithout = perQuarterSavings + currWithout;
+        let withSdf;
+        let withoutSdf = tempQuarterWithout - (currWithout * .25);
+        if (tempQuarterWith * .05 > 100) {
+          withSdf = (tempQuarterWith + 100);
+        } else {
+          withSdf = tempQuarterWith * 1.05;
+        }
+        // add regular quarter end amt
+        amounts.sdfSavings.push(withSdf);
+        amounts.regeSavings.push(withoutSdf);
+        // add withdrawl amt
+        amounts.sdfSavings.push(withSdf  - (withSdf * .25));
+        amounts.regeSavings.push(withoutSdf - (withoutSdf * .25));
+      } else if (i > 4 && i < 10) {
+        let currSdfSavings = amounts.sdfSavings[i]
+        let currWithout = amounts.regeSavings[i]
+        let tempQuarterWith = perQuarterSavings + currSdfSavings;
+        let tempQuarterWithout = perQuarterSavings + currWithout;
+        let withSdf;
+        let withoutSdf = tempQuarterWithout - (currWithout * .25);
+        if (tempQuarterWith * .05 > 100) {
+          withSdf = tempQuarterWith + 100;
+        } else {
+          withSdf = tempQuarterWith * 1.05;
+        }
+        amounts.sdfSavings.push(withSdf);
+        amounts.regeSavings.push(withoutSdf);
+      } else if (i > 10) {
+        let currSdfSavings = amounts.sdfSavings[i + 1]
+        let currWithout = amounts.regeSavings[i + 1]
+        let tempQuarterWith = perQuarterSavings + currSdfSavings;
+        let tempQuarterWithout = perQuarterSavings + currWithout;
+        let withSdf;
+        let withoutSdf = tempQuarterWithout - (currWithout * .25);
+        if (tempQuarterWith * .05 > 100) {
+          withSdf = tempQuarterWith + 100;
+        } else {
+          withSdf = tempQuarterWith * 1.05;
+        }
+        amounts.sdfSavings.push(withSdf);
+        amounts.regeSavings.push(withoutSdf);
       } else {
-        return (cont * (1.05 ** 4)).toFixed(2);
+        let withSdf;
+        let withoutSdf = quarterlySavings - (quarterlySavings * .25);
+        if (fivePercent > 100) {
+          withSdf = quarterlySavings + 100;
+        } else {
+          withSdf = quarterlySavings * 1.05;
+        }
+        amounts.sdfSavings.push(withSdf);
+        amounts.regeSavings.push(withoutSdf);
       }
-    })
+    }
+    return amounts;
   }
-  // calculate compounded interest rate for each year
+  // calculate compounded interest rate for each quarter
   const CAGR = (startVals, endVals) => {
+    let index = 0;
     return startVals.map((val, idx) => {
-      // val = Number.parseFloat(val)
-      const numPeriods = (idx + 1) * 4
-      const compounded = Math.pow((endVals[idx] / val), 1.05 / numPeriods) - 1;
-      return `Year ${idx + 1}, ${Math.round(compounded * 10000) / 100}% APY`;
+      if (idx === 0) {
+        return 0;
+      } else if (idx % 4 === 0) {
+        const year = idx === 4 ? 1 : idx === 8 ? 2 : 3
+        const numPeriods = idx
+        console.log('end val: ', endVals[idx], ' start val: ', startVals[index], ' numPeriods: ', numPeriods)
+        const compounded = Math.pow((endVals[idx] / startVals[index]), 1.05 / numPeriods) - 1;
+        index = idx;
+        return `Year ${year}, ${Math.round(compounded * 10000) / 100}% APY`;
+      }
     })
   }
   // calculate average savings over 5 years to get resilliance %
   const resiliant = (endVals) => {
-    const total = endVals.reduce((acc, current)=> acc + Number.parseFloat(current), 0);
-    console.log('total: ', total)
-    const average = total / 5;
-    return (average / 250).toFixed(2);
+    const year1 = endVals[4];
+    const year3 = endVals[14]
+    return {
+      year_one: (year1 / 250).toFixed(2),
+      year_three: (year3 / 250).toFixed(2)
+    };
   }
 
   const calculate = (event) => {
@@ -171,23 +272,26 @@
 
     const savings = get('paycheck-savings');
 
-    const savings_without_sdf = yearlyEmpCont(savings, freq)
-    console.log('no rewards=== ', savings_without_sdf)
-    // const employer_contribution = (savings_without_sdf * (1.05 ** (q / 3))) - savings_without_sdf;
-    const with_employer_rewards = rewards(savings_without_sdf);
-    console.log('with rewards = ', with_employer_rewards)
-    const sdf_intrest = CAGR(savings_without_sdf, with_employer_rewards)
-    console.log('sdf_interest : ', sdf_intrest)
-    const resilliant_num = resiliant(with_employer_rewards);
-    console.log('resilliant_num: ', resilliant_num)
+    const contributionTotals = quarterEmpCont(savings, freq)
+    console.log('totals: ', contributionTotals)
+    // const withNoSdf = withoutSDF(contributionTotals)
+    // const with_employer_rewards = rewards(contributionTotals);
+    // console.log('with rewards = ', with_employer_rewards)
+    // const sdf_intrest = CAGR(savings_without_sdf, with_employer_rewards)
+    // console.log('sdf_interest : ', sdf_intrest)
+    const resilliant_nums = resiliant(contributionTotals.sdfSavings);
+    console.log('res_nums: ', resilliant_nums)
+
+    // console.log('resilliant_num: ', resilliant_num)
 
 
-    myChart.data.labels = sdf_intrest;
-    myChart.data.datasets[0].data = savings_without_sdf;
-    myChart.data.datasets[1].data = with_employer_rewards;
+    // myChart.data.labels = sdf_intrest;
+    myChart.data.datasets[0].data = contributionTotals.regeSavings;
+    myChart.data.datasets[1].data = contributionTotals.sdfSavings;
     myChart.update();
 
-    set('res-percent', resilliant_num)
+    set('res-percent-one', `${resilliant_nums.year_one}x`);
+    set('res-percent-three', `${resilliant_nums.year_three}x`);
   };
 
 
@@ -235,7 +339,9 @@
   .btn-group {
     display: flex;
     flex-direction: row;
-    gap: 2px;
+    /* justify-content: space-between; */
+    /* width: auto; */
+    gap: 14px;
   }
 
   .freq-btn {
@@ -399,13 +505,14 @@
   .sdf-power {
     text-align: center;
     color: #ffa926;
+    font-size: 20px;
   }
   .disclaimer {
     text-align: center;
     color: #000;
     font-size: 12px;
   }
-  #res-percent {
+  .res-percent {
     color: #004462;
   }
 </style>
